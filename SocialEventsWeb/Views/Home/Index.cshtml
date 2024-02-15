@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<br />
+<br />
+<br />
+
+<div class="jumbotron">
+    <h1>Social Events Chat</h1>
+    <p class="lead">This sample app makes show cases a number of different technologies including OpenNLP, OpenAI and Microsoft Graph.</p>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h4>Welcome @ViewBag.User.DisplayName!</h4>
+        <p>Use the navigation bar at the top of the page to get started.</p>
+    }
+    else
+    {
+        @Html.ActionLink("Click here to sign in", "SignIn", "Account", new { area = "" }, new { @class = "btn btn-primary btn-large" })
+    }
+</div>
