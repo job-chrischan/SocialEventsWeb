@@ -1,0 +1,102 @@
+﻿@{
+    ViewData["Title"] = "ChatBot";
+}
+
+@model Chatbot
+<br />
+<br />
+<br />
+<section style="background-color: #eee;">
+    <div class="container py-5">
+
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-10 col-lg-10 col-xl-10">
+
+                <div class="card" id="chat1" style="border-radius: 15px;">
+                    <div class="card-header d-flex justify-content-between align-items-center p-3 bg-info text-white border-bottom-0"
+                         style="border-top-left-radius: 15px; border-top-right-radius: 15px;">
+                        <p class="mb-0 fw-bold">Live chat</p>
+                    </div>
+                    <div class="card-body">
+
+        @foreach (var message in Model.Workflow.Messages)
+        {
+            <div class="d-flex flex-row justify-content-@((message.Sender == "Robot") ? "start" : "end") mb-4">
+                @if (message.Sender == "Robot")
+                {
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' fill='currentColor' class='bi bi-chat-left-dots-fill' viewBox='0 0 16 16'%3E%3Cpath d='M0 2a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4.414a1 1 0 0 0-.707.293L.854 15.146A.5.5 0 0 1 0 14.793zm5 4a1 1 0 1 0-2 0 1 1 0 0 0 2 0m4 0a1 1 0 1 0-2 0 1 1 0 0 0 2 0m3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2'/%3E%3C/svg%3E" alt="Chat Icon">
+                }
+
+                <div class="@(message.Sender == "Robot" ? "p-3 ms-3" : "p-3 me-3")" style="border-radius: 15px; background-color: @(message.Sender == "Robot" ? "rgba(57, 192, 237,.2)" : "#fbfbfb");">
+                    <p class="small mb-0">@message.Text</p>
+                </div>
+
+                @if (message.Sender == "User")
+                {
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;">
+                }
+            </div>
+        }
+                    </div>
+                    <div class="form-outline">
+                        <textarea class="form-control" id="textAreaExample" rows="4"></textarea>
+                        <label class="form-label" for="textAreaExample">Type your message</label>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        // Event handler for pressing Enter key in the textarea
+        $('#textAreaExample').keypress(function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+
+                // Get the entered text
+                var newText = $(this).val();
+
+                // Update the chatbox content
+                var chatbox = $('#chat1 .card-body');
+                chatbox.append('<div class="d-flex flex-row justify-content-end mb-4">' +
+                    '<div class="p-3 me-3 border" style="border-radius: 15px; background-color: #fbfbfb;">' +
+                    '<p class="small mb-0">' + newText + '</p>' +
+                    '</div>' +
+                    '<img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava2-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;">' +
+                    '</div>');
+
+                // Clear the textarea
+                $(this).val('');
+
+                // Send the message to the server
+                sendMessageToServer(newText);
+            }
+        });
+
+        function sendMessageToServer(message) {
+            // Perform an AJAX request to send the message to the server
+            $.ajax({
+                url: '/ChatBot/SendMessage', // Replace with your server-side endpoint
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ message: message }),
+                success: function (response) {
+                    // Handle the server response if needed
+                    $('#chat1 .card-body').append(response);
+                    // Clear the textarea after sending the message
+                    $('#textAreaExample').val('');
+                    console.log('Message sent successfully');
+                },
+                error: function (xhr, status, error) {
+                    // Handle the error if the request fails
+                    console.error('Failed to send message:', error);
+
+                    // Display an error message to the user (you can customize this part)
+                    alert('Failed to send message. Please try again.');
+                }
+            });
+        }
+    });
+</script>
